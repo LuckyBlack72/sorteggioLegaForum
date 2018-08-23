@@ -8,9 +8,11 @@ var Excel = require('exceljs'); // LF 16/07/2018 per creare export Excel
 //per le email con attachments
 
 
-//LocalHost
+//se è definita POSTGRESQL_URI la usa altrimenti usa LocalHost
+// postgresql://postgres:root@localhost:5432/postgres
+var connectionData = process.env.POSTGRESQL_URI || 'postgresql://postgres:root@localhost:5432/postgres';
 /*
-const connectionData = {
+                    {
                       host : 'localhost',
                       port : 5432,
                       database : 'postgres',
@@ -18,21 +20,10 @@ const connectionData = {
                       password : 'root'
                     };
 */
-//heroku
-const connectionData = {
-  host : 'ec2-54-217-235-166.eu-west-1.compute.amazonaws.com',
-  port : 5432,
-  database : 'dftvfjt8jjrnrc',
-  user : 'ptyktekfrbhkpv',
-  password : '7d846abb0eeba7d8e1f5cfb0972ca3ba47eeffc200558fc8c6baf342fb02df72'
-};                    
-
-
 var db  =  promisePostGres(connectionData);               
 
 /* GET getFasce. */ /* Fatto */
 router.get('/getFasce', function(req, res, next) {
-
 
   var queryText = 'select * from legaforum.sorteggio ' +  
   'where stagione = ' + req.query.stagione + ' and serie = ' + '\'' + req.query.serie + '\'' +  ' ' + 

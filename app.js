@@ -3,11 +3,16 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var compression = require('compression');
+var helmet = require('helmet'); //security
 
 //var restController = require('./routes/restController'); //MySql
 var restControllerPG = require('./routes/restControllerPG'); //PostGres SQL
 
 var app = express();
+
+app.use(helmet()); //security
+app.use(compression()); //Compress all routes
 
 app.use(function(req, res, next) {
   // IE9 doesn't set headers for cross-domain ajax requests

@@ -12,15 +12,11 @@
     "exceljs": "^1.6.0",
     "express": "~4.15.2",
     "express-generator": "^4.16.0",
-    "gmail-api-create-message-body": "^1.0.0",
     "hbs": "^4.0.1",
     "jade": "~1.11.0",
     "morgan": "~1.8.1",
     "nodemailer": "^4.6.8",
     "pg-promise": "^8.4.6",
-    "promise-mysql": "^3.3.1",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.2",
-    "xlsx": "^0.13.4"
+    "promise-mysql": "^3.3.1"
   }
 }

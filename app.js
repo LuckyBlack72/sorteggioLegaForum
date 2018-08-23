@@ -15,7 +15,7 @@ app.use(function(req, res, next) {
       req.headers['content-type'] = "application/json; charset=UTF-8";
   }
   next();
-})
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

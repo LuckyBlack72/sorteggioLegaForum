@@ -10,7 +10,7 @@ var Excel = require('exceljs'); // LF 16/07/2018 per creare export Excel
 
 //se è definita POSTGRESQL_URI la usa altrimenti usa LocalHost
 // postgresql://postgres:root@localhost:5432/postgres
-var connectionData = process.env.POSTGRESQL_URI || 'postgresql://postgres:root@localhost:5432/postgres';
+var connectionData = process.env.DATABASE_URL || 'postgresql://postgres:root@localhost:5432/postgres';
 /*
                     {
                       host : 'localhost',

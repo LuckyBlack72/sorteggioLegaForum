@@ -7,6 +7,9 @@ var nodeMailer = require('nodemailer');
 var Excel = require('exceljs'); // LF 16/07/2018 per creare export Excel
 //per le email con attachments
 
+
+//LocalHost
+/*
 const connectionData = {
                       host : 'localhost',
                       port : 5432,
@@ -14,6 +17,16 @@ const connectionData = {
                       user : 'postgres',
                       password : 'root'
                     };
+*/
+//heroku
+const connectionData = {
+  host : 'ec2-54-217-235-166.eu-west-1.compute.amazonaws.com',
+  port : 5432,
+  database : 'dftvfjt8jjrnrc',
+  user : 'ptyktekfrbhkpv',
+  password : '7d846abb0eeba7d8e1f5cfb0972ca3ba47eeffc200558fc8c6baf342fb02df72'
+};                    
+
 
 var db  =  promisePostGres(connectionData);               
 

@@ -408,4 +408,24 @@ router.post('/sendMail', function(req, res, next) {
 
 });
 
+router.post('/checkSorteggio', function(req, res, next) {
+    
+  promiseMySql.createConnection(connectionData).then(function(connection){
+
+    var data = connection.query('select count(*) tot from sorteggio where `stagione` = ' + req.body.stagione + ' and `girone` is not null');
+    connection.end();
+    return data;
+      
+  }).then(function(data){
+    
+    if(parseInt(data[0].tot) < 96){
+      res.status(200).json('OK');
+    }else{
+      res.status(500).json('KO');
+    }   
+    
+  });  
+    
+});
+
 module.exports = router;

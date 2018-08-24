@@ -10,8 +10,7 @@ var Excel = require('exceljs'); // LF 16/07/2018 per creare export Excel
 
 //se è definita POSTGRESQL_URI la usa altrimenti usa LocalHost
 // postgresql://postgres:root@localhost:5432/postgres
-var connectionData = process.env.DATABASE_URL || 'postgres://postgres:root@localhost:5432/postgres';
-/*
+var connectionData = process.env.DATABASE_URL || // URI 'postgres://postgres:root@localhost:5432/postgres';
                     {
                       host : 'localhost',
                       port : 5432,
@@ -19,7 +18,7 @@ var connectionData = process.env.DATABASE_URL || 'postgres://postgres:root@local
                       user : 'postgres',
                       password : 'root'
                     };
-*/
+
 var db  =  promisePostGres(connectionData);               
 
 /* GET getFasce. */ /* Fatto */
@@ -217,7 +216,7 @@ router.post('/getSorteggioSquadra', function(req, res, next) {
 
 
 
-/* POST getSquadre */
+/* POST checkPassword */
 router.post('/checkPassword', function(req, res, next) {
 
   var queryText = 'select count(*) from legaforum.password where password = ' + '\'' + req.body.password + '\'';
@@ -402,5 +401,26 @@ router.post('/sendMail', function(req, res, next) {
   //--------------------------------------------------------
 
 });
+
+/* POST checkSorteggio */
+router.post('/checkSorteggio', function(req, res, next) {
+
+  var queryText = 'select count(*) from legaforum.sorteggio where stagione = ' + req.body.stagione + ' ' +
+                  'and girone is not null';
+
+  db.one(queryText).then(function (data) {
+    
+    if(parseInt(data.count) < 96){
+      res.status(200).json('OK');
+    }else{
+      res.status(500).json('KO');
+    }  
+  })
+  .catch(error => { //gestione errore
+    res.status(500).json('KO');
+  });  
+  
+});
+
 
 module.exports = router;

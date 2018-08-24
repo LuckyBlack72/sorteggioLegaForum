@@ -34,21 +34,9 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// a middleware with no mount path; gets executed for every request to the app
-
-/*
-app.use(function(req, res, next) {
-  //Cross origin allowance
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Method", "POST, OPTIONS, GET");
-  res.header("Access-Control-Allow-Credential", "true");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-*/
+app.options('*', cors()); // include before other routes
 
 //app.use('/', restController); //solo per le richieste ajax e MySQL
-app.options('*', cors()); // include before other routes
 app.use('/', restControllerPG); //solo per le richieste ajax e PortGress Sql
 
 // catch 404 and forward to error handler

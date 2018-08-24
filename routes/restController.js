@@ -300,24 +300,41 @@ router.post('/sendMail', function(req, res, next) {
   var mailSender    = req.body.sender;
   var mailSubject   = req.body.mailSubject;
   var mailText      = req.body.mailText;
+  var environment   = req.body.environment;
   
   //i dati per il file Excel
   var serie     = req.body.serie;
   var stagione  = req.body.stagione;
   var excelData = req.body.excelData;
 
-  let transporter = nodeMailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'fantasportLB@gmail.com',
-        pass: 'fantacalcio72'
-    }
-  });  
+  var mailServer;
+
+  if(environment === 'PRD') {
+    mailServer = {
+      host: 'smtps.aruba.it',
+      port: 465,
+      secure: true,
+      auth: {
+          user: mailSender,
+          pass: 'provalf18'
+      }
+    };  
+  } else {
+    mailServer = {
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+          user: mailSender,
+          pass: 'fantacalcio72'
+      }
+    };  
+  }
+
+  let transporter = nodeMailer.createTransport(mailServer);
 
   let mailOptions = {
-    from: '"Lega Forum Sorteggio" <' + mailSender + ' >', // sender address
+    from: '"Sorteggio Lega Forum" <' + mailSender + ' >', // sender address
     to: mailRecipient, // list of receivers
     subject: mailSubject, // Subject line
     text: mailText, // plain text body
@@ -325,88 +342,102 @@ router.post('/sendMail', function(req, res, next) {
     attachments: []
   };
 
-  //Gestione Excel -----------------------------------------
-  var excelRows = [];
-  var workbook = new Excel.Workbook();
-  workbook.creator = 'Applicazione Sorteggio Lega Forum';
-  workbook.views = [
-    {
-      x: 0, y: 0, width: 10000, height: 20000,
-      firstSheet: 0, activeTab: 1, visibility: 'visible'
-    }
-  ];
-
-  //Loop sui dati
-
-  // Serie
-  for (let i = 0 ; i < excelData.length ; i++) {
-    //Gironi della Serie
-    for (let j = 0; j < excelData[i].length; j++) {
-      excelRows.push(
-                      {
-                        squadra:    excelData[i][j].squadra,
-                        allenatore: excelData[i][j].allenatore,
-                        ods:        excelData[i][j].ods
-                      }
-                    );
-    }
-    workbook.addWorksheet('Serie' + ' ' + serie + ' - ' + 'Girone ' +  excelData[i][0].girone);
-    var worksheet = workbook.getWorksheet('Serie' + ' ' + serie + ' - ' + 'Girone ' +  excelData[i][0].girone);
-    worksheet.columns = [
-      { header: 'Squadra', key: 'squadra', width: 30 },
-      { header: 'Allenatore', key: 'allenatore', width: 30 },
-      { header: 'ODS', key: 'ods', width: 5 }
-  ];
-    worksheet.addRows(excelRows);
+  if(fs.existsSync('./export/' + 'ExportSerie' + serie + stagione + '.xlsx') && environment === 'PRD' ){ //il file esiste non lo devo generare
     
-//    worksheet.getRow(1).alignment = { horizontal : 'center'};
-//    worksheet.getRow(1).font = { bold : true};
-    
-    for(let x = 1; x < 4; x++){
-      worksheet.getCell(1, x).alignment = { 
-          horizontal : 'center'
-        };
-      worksheet.getCell(1, x).font = { 
-          bold : true
-        };
-      worksheet.getCell(1 , x).fill = {
-          type : 'pattern', 
-          pattern : 'solid', 
-          fgColor : {argb : 'FFFFC000'}
-        };      
-        worksheet.getCell(1 , x).border = {
-          top: {style:'thin'},
-          left: {style:'thin'},
-          bottom: {style:'thin'},
-          right: {style:'thin'}
-        };
+    mailOptions.attachments.push({path : './export/' + 'ExportSerie' + serie + stagione + '.xlsx'});
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.status(500).json('KO');
+      }else{
+        console.log('Message %s sent: %s', info.messageId, info.response);
+        res.status(200).json('OK');
+      }
+    });
+  
+  } else {
+    //Gestione Excel -----------------------------------------
+    var excelRows = [];
+    var workbook = new Excel.Workbook();
+    workbook.creator = 'Applicazione Sorteggio Lega Forum';
+    workbook.views = [
+      {
+        x: 0, y: 0, width: 10000, height: 20000,
+        firstSheet: 0, activeTab: 1, visibility: 'visible'
+      }
+    ];
+
+    //Loop sui dati
+
+    // Serie
+    for (let i = 0 ; i < excelData.length ; i++) {
+      //Gironi della Serie
+      for (let j = 0; j < excelData[i].length; j++) {
+        excelRows.push(
+                        {
+                          squadra:    excelData[i][j].squadra,
+                          allenatore: excelData[i][j].allenatore,
+                          ods:        excelData[i][j].ods
+                        }
+                      );
+      }
+      workbook.addWorksheet('Serie' + ' ' + serie + ' - ' + 'Girone ' +  excelData[i][0].girone);
+      var worksheet = workbook.getWorksheet('Serie' + ' ' + serie + ' - ' + 'Girone ' +  excelData[i][0].girone);
+      worksheet.columns = [
+        { header: 'Squadra', key: 'squadra', width: 30 },
+        { header: 'Allenatore', key: 'allenatore', width: 30 },
+        { header: 'ODS', key: 'ods', width: 5 }
+    ];
+      worksheet.addRows(excelRows);
+      
+      for(let x = 1; x < 4; x++){
+        worksheet.getCell(1, x).alignment = { 
+            horizontal : 'center'
+          };
+        worksheet.getCell(1, x).font = { 
+            bold : true
+          };
+        worksheet.getCell(1 , x).fill = {
+            type : 'pattern', 
+            pattern : 'solid', 
+            fgColor : {argb : 'FFFFC000'}
+          };      
+          worksheet.getCell(1 , x).border = {
+            top: {style:'thin'},
+            left: {style:'thin'},
+            bottom: {style:'thin'},
+            right: {style:'thin'}
+          };
+      }
+
+      excelRows = []; // ripulisco la array
     }
 
-    excelRows = []; // ripulisco la array
+    workbook.xlsx.writeFile('./export/' + 'ExportSerie' + serie + stagione + '.xlsx')
+      .then(function() {
+        mailOptions.attachments.push({path : './export/' + 'ExportSerie' + serie + stagione + '.xlsx'});
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.log(error);
+            res.status(500).json('KO');
+          }else{
+            console.log('Message %s sent: %s', info.messageId, info.response);
+            res.status(200).json('OK');
+          }
+        });
+      })
+      .catch(error => { //gestione errore
+        console.log(error);
+        res.status(500).json('KO');
+      });
+
+    //--------------------------------------------------------
   }
 
-  workbook.xlsx.writeFile('./export/' + 'ExportSerie' + serie + stagione + '.xlsx')
-    .then(function() {
-      mailOptions.attachments.push({path : './export/' + 'ExportSerie' + serie + stagione + '.xlsx'});
-
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log(error);
-          res.status(500).json('KO');
-        }else{
-          console.log('Message %s sent: %s', info.messageId, info.response);
-          res.status(200).json('OK');
-        }
-      });
-    })
-    .catch(error => { //gestione errore
-      console.log(error);
-      res.status(500).json('KO');
-    });
-
-  //--------------------------------------------------------
-
 });
+
 
 router.post('/checkSorteggio', function(req, res, next) {
     

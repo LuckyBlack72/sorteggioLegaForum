@@ -35,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req, res, next) {
   //Cross origin allowance
   res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Method", "POST, OPTIONS, GET");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });

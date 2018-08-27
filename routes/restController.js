@@ -450,11 +450,14 @@ router.post('/checkSorteggio', function(req, res, next) {
   }).then(function(data){
     
     if(parseInt(data[0].tot) < 96){
-      res.status(200).json('OK');
+      res.status(200).json(true);
     }else{
-      res.status(500).json('KO');
+      res.status(200).json(false);
     }   
     
+  })
+  .catch(error => { //gestione errore
+    res.status(500).json(false);
   });  
     
 });

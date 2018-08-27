@@ -280,7 +280,7 @@ router.post('/getSorteggioStagioneSerie', function(req, res, next) {
   })
   .catch(error => { //gestione errore
     var gironeArray = [];
-    res.status(200).json(giorneArray);
+    res.status(200).json(gironeArray);
   });  
 
 });

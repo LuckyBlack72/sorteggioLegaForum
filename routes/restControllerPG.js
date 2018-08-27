@@ -441,13 +441,13 @@ router.post('/checkSorteggio', function(req, res, next) {
   db.one(queryText).then(function (data) {
     
     if(parseInt(data.count) < 96){
-      res.status(200).json('OK');
+      res.status(200).json(true);
     }else{
-      res.status(500).json('KO');
+      res.status(200).json(false);
     }  
   })
   .catch(error => { //gestione errore
-    res.status(500).json('KO');
+    res.status(500).json(false);
   });  
   
 });

@@ -459,7 +459,62 @@ router.post('/checkSorteggio', function(req, res, next) {
   .catch(error => { //gestione errore
     res.status(500).json(false);
   });  
+
+});
+
+router.post('/importRanking', function(req, res, next) {
+
+  promiseMySql.createConnection(connectionData).then(function(connection){
+    var ranking = req.body.ranking;
+    var queryText = '';
+    connection.query('delete form Sorteggio ' +
+                     'where `stagione` = ' + req.body.stagione
+                    );
+    for (var i = 0 ; i < ranking.length ; i++){
+
+        queryText = 'insert into legaforum.sorteggio ( `allenatore`, `fascia`, `girone`, `ods`, `ranking`, `serie`, `squadra`, `stagione` ) ' +
+        'values ' +
+        '( ' + 
+        '"' + ranking[i].allenatore + '"' + ', ' + //allenatore
+        ranking[i].fascia + ', ' + //fascia
+        'NULL' + ', ' + //girone
+        0 + ', ' + //ods
+        ranking[i].ranking + ', ' + //ranking
+        '"' + ranking[i].serie + '"' + ', ' + //serie
+        '"' + ranking[i].squadra + '"' + ', ' + //squadra
+        ranking[i].stagione + ' ' + //stagione
+        ')';
+        connection.query(queryText);    
+    }
+    connection.end();
+  }).then(function(){
+    //torno un'oggetto json
+    res.status(200).json('OK');
+  });  
+});
+
+
+router.post('/checkRanking', function(req, res, next) {
     
+  promiseMySql.createConnection(connectionData).then(function(connection){
+
+    var data = connection.query('select count(*) tot from sorteggio where `stagione` = ' + req.body.stagione);
+    connection.end();
+    return data;
+      
+  }).then(function(data){
+    
+    if(parseInt(data[0].tot) < 96){ //ranking non presente o non completo
+      res.status(200).json(false);
+    }else{
+      res.status(200).json(true);
+    }   
+    
+  })
+  .catch(error => { //gestione errore
+    res.status(500).json(false);
+  });  
+
 });
 
 module.exports = router;

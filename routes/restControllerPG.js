@@ -452,5 +452,65 @@ router.post('/checkSorteggio', function(req, res, next) {
   
 });
 
+/* POST importRanking */
+router.post('/importRanking', function(req, res, next) {
+
+  var ranking = req.body.ranking;
+
+  //gestione transazionale delle insert
+  db.tx(function (t) {
+
+    var queryText = 'delete from legaforum.sorteggio ' +
+    'where stagione = ' + req.body.stagione;
+    
+    db.none(queryText).then(function () {
+      var inserts = [];
+      for (var i = 0 ; i < ranking.length ; i++){
+          queryText = 'insert into legaforum.sorteggio ( allenatore, fascia, girone, ods, ranking, serie, squadra, stagione ) ' +
+          'values ' +
+          '( ' + 
+          '\'' + ranking[i].allenatore + '\'' + ', ' + //allenatore
+          ranking[i].fascia + ', ' + //fascia
+          'NULL' + ', ' + //girone
+          0 + ', ' + //ods
+          ranking[i].ranking + ', ' + //ranking
+          '\'' + ranking[i].serie + '\'' + ', ' + //serie
+          '\'' + ranking[i].squadra + '\'' + ', ' + //squadra
+          ranking[i].stagione + ' ' + //stagione
+          ')';
+          inserts.push(db.none(queryText));
+      }       
+      return t.batch(inserts);
+    });
+  })
+  .then(function (data) {
+    res.status(200).json(true);
+  })
+  .catch(function (error) {
+    res.status(500).json(false);
+  });
+  //----------------------------------------------------------
+
+});
+
+/* POST checkRanking */
+router.post('/checkRanking', function(req, res, next) {
+
+  var queryText = 'select count(*) from legaforum.sorteggio where stagione = ' + req.body.stagione;
+
+  db.one(queryText).then(function (data) {
+    
+    if(parseInt(data.count) < 96){ //ranking non presente o non completo
+      res.status(200).json(false);
+    }else{
+      res.status(200).json(true);
+    }  
+  })
+  .catch(error => { //gestione errore
+    res.status(500).json(false);
+  });  
+  
+});
+
 
 module.exports = router;

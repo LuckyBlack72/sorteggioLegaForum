@@ -478,6 +478,7 @@ router.post('/importRanking', function(req, res, next) {
           '\'' + ranking[i].squadra + '\'' + ', ' + //squadra
           ranking[i].stagione + ' ' + //stagione
           ')';
+          // console.log(queryText);
           inserts.push(db.none(queryText));
       }       
       return t.batch(inserts);

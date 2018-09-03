@@ -453,32 +453,42 @@ router.post('/checkSorteggio', function(req, res, next) {
 });
 
 /* POST importRanking */
-router.post('/importRanking', function(req, res, next) {
+router.post('/importRankingSorteggio', function(req, res, next) {
 
-  var ranking = req.body.ranking;
+  var rankingSorteggio = req.body.rankingSorteggio;
+  var importTipo = req.body.importTipo;
+  var stagione = req.body.stagione;
 
   //gestione transazionale delle insert
   db.tx(function (t) {
 
     var queryText = 'delete from legaforum.sorteggio ' +
-    'where stagione = ' + req.body.stagione;
+    'where stagione = ' + stagione;
     
     db.none(queryText).then(function () {
       var inserts = [];
-      for (var i = 0 ; i < ranking.length ; i++){
+      for (var i = 0 ; i < rankingSorteggio.length ; i++){
           queryText = 'insert into legaforum.sorteggio ( allenatore, fascia, girone, ods, ranking, serie, squadra, stagione ) ' +
           'values ' +
           '( ' + 
-          '\'' + ranking[i].allenatore + '\'' + ', ' + //allenatore
-          ranking[i].fascia + ', ' + //fascia
-          'NULL' + ', ' + //girone
-          0 + ', ' + //ods
-          ranking[i].ranking + ', ' + //ranking
-          '\'' + ranking[i].serie + '\'' + ', ' + //serie
-          '\'' + ranking[i].squadra + '\'' + ', ' + //squadra
-          ranking[i].stagione + ' ' + //stagione
+          '\'' + rankingSorteggio[i].allenatore + '\'' + ', ' + //allenatore
+          rankingSorteggio[i].fascia + ', '; //fascia
+          
+          if (importTipo === 'R'){
+            queryText = queryText + 'NULL' + ', ' + //girone
+            0 + ', '; //ods
+          } else {
+            queryText = queryText + '\'' + rankingSorteggio[i].girone + '\'' + ', ' + //girone
+            rankingSorteggio[i].ods + ', '; //ods
+          }
+
+          queryText = queryText +
+          rankingSorteggio[i].ranking + ', ' + //ranking
+          '\'' + rankingSorteggio[i].serie + '\'' + ', ' + //serie
+          '\'' + rankingSorteggio[i].squadra + '\'' + ', ' + //squadra
+          rankingSorteggio[i].stagione + ' ' + //stagione
           ')';
-          // console.log(queryText);
+           console.log(queryText);
           inserts.push(db.none(queryText));
       }       
       return t.batch(inserts);

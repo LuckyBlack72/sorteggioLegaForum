@@ -462,13 +462,16 @@ router.post('/checkSorteggio', function(req, res, next) {
 
 });
 
-router.post('/importRanking', function(req, res, next) {
+router.post('/importRankingSorteggio', function(req, res, next) {
 
   promiseMySql.createConnection(connectionData).then(function(connection){
-    var ranking = req.body.ranking;
+    var rankingSorteggio = req.body.rankingSorteggio;
+    var importTipo = req.body.importTipo;
+    var stagione = req.body.stagione;
+
     var queryText = '';
     connection.query('delete form Sorteggio ' +
-                     'where `stagione` = ' + req.body.stagione
+                     'where `stagione` = ' + stagione
                     );
     for (var i = 0 ; i < ranking.length ; i++){
 
@@ -476,9 +479,17 @@ router.post('/importRanking', function(req, res, next) {
         'values ' +
         '( ' + 
         '"' + ranking[i].allenatore + '"' + ', ' + //allenatore
-        ranking[i].fascia + ', ' + //fascia
-        'NULL' + ', ' + //girone
-        0 + ', ' + //ods
+        ranking[i].fascia + ', ';//fascia
+
+        if (importTipo === 'R') {
+          queryText = queryText + 'NULL' + ', ' + //girone
+          0 + ', '; //ods
+        } else {
+          queryText = queryText + '"' + rankingSorteggio[i].girone + '"' + ', ' + //girone
+          rankingSorteggio[i].ods + ', '; //ods
+        }
+
+        queryText = queryText +
         ranking[i].ranking + ', ' + //ranking
         '"' + ranking[i].serie + '"' + ', ' + //serie
         '"' + ranking[i].squadra + '"' + ', ' + //squadra

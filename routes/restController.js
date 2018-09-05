@@ -7,7 +7,7 @@ var nodeMailer = require('nodemailer');
 var Excel = require('exceljs'); // LF 16/07/2018 per creare export Excel
 //per le email con attachments
 
-var connectionData = {
+var connectionData = process.env.DATABASE_URL || {
                       host : "localhost",
                       user : "root",
                       password : "",

@@ -12,6 +12,9 @@ var restControllerPG = require('./routes/restControllerPG'); //PostGres SQL
 
 var app = express();
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
 app.use(cors()); //CORS handling
 
 app.use(helmet()); //security

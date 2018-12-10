@@ -453,21 +453,36 @@ router.post('/checkSorteggio', function(req, res, next) {
 });
 
 /* POST importRanking */
-router.post('/importRankingSorteggio', function(req, res, next) {
+router.post('/importRankingSorteggioClassifica', function(req, res, next) {
 
   var rankingSorteggio = req.body.rankingSorteggio;
   var importTipo = req.body.importTipo;
   var stagione = req.body.stagione;
-
+  var queryText = '';
   //gestione transazionale delle insert
   db.tx(function (t) {
 
-    var queryText = 'delete from legaforum.sorteggio ' +
-    'where stagione = ' + stagione;
+    if(importTipo === 'C'){
+      queryText = 'update legaforum.sorteggio set classifica = null ' +
+      'where stagione = ' + stagione;
+    } else {
+      queryText = 'delete from legaforum.sorteggio ' +
+      'where stagione = ' + stagione;
+    }
     
     db.none(queryText).then(function () {
       var inserts = [];
       for (var i = 0 ; i < rankingSorteggio.length ; i++){
+
+        if(importTipo === 'C'){
+
+          queryText = 'update legaforum.sorteggio ' +
+          'set classifica = ' + rankingSorteggio[i].classifica + ' ' +
+          'where stagione = ' + rankingSorteggio[i].stagione + ' and ' +
+          'squadra = ' + '\'' + rankingSorteggio[i].squadra + '\'';
+        
+        } else {
+        
           queryText = 'insert into legaforum.sorteggio ( allenatore, fascia, girone, ods, ranking, serie, squadra, stagione ) ' +
           'values ' +
           '( ' + 
@@ -488,8 +503,11 @@ router.post('/importRankingSorteggio', function(req, res, next) {
           '\'' + rankingSorteggio[i].squadra + '\'' + ', ' + //squadra
           rankingSorteggio[i].stagione + ' ' + //stagione
           ')';
-           console.log(queryText);
+            console.log(queryText);
           inserts.push(db.none(queryText));
+
+        }
+
       }       
       return t.batch(inserts);
     });

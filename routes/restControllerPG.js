@@ -456,14 +456,14 @@ router.post('/checkSorteggio', function(req, res, next) {
 router.post('/importRankingSorteggioClassifica', function(req, res, next) {
 
   var rankingSorteggio = req.body.rankingSorteggio;
-  var importTipo = req.body.importTipo;
+  var importTipo = req.body.tipoImport;
   var stagione = req.body.stagione;
   var queryText = '';
   //gestione transazionale delle insert
   db.tx(function (t) {
 
     if(importTipo === 'C'){
-      queryText = 'update legaforum.sorteggio set classifica = null ' +
+      queryText = 'update legaforum.sorteggio set posizione = null ' +
       'where stagione = ' + stagione;
     } else {
       queryText = 'delete from legaforum.sorteggio ' +
@@ -477,10 +477,12 @@ router.post('/importRankingSorteggioClassifica', function(req, res, next) {
         if(importTipo === 'C'){
 
           queryText = 'update legaforum.sorteggio ' +
-          'set classifica = ' + rankingSorteggio[i].classifica + ' ' +
+          'set posizione = ' + rankingSorteggio[i].posizione + ' ' +
           'where stagione = ' + rankingSorteggio[i].stagione + ' and ' +
           'squadra = ' + '\'' + rankingSorteggio[i].squadra + '\'';
-        
+          
+          //console.log(queryText);
+          
         } else {
         
           queryText = 'insert into legaforum.sorteggio ( allenatore, fascia, girone, ods, ranking, serie, squadra, stagione ) ' +
@@ -503,7 +505,7 @@ router.post('/importRankingSorteggioClassifica', function(req, res, next) {
           '\'' + rankingSorteggio[i].squadra + '\'' + ', ' + //squadra
           rankingSorteggio[i].stagione + ' ' + //stagione
           ')';
-            console.log(queryText);
+          //  console.log(queryText);
           inserts.push(db.none(queryText));
 
         }

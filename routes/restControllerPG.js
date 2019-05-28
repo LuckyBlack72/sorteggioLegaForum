@@ -506,9 +506,10 @@ router.post('/importRankingSorteggioClassifica', function(req, res, next) {
           rankingSorteggio[i].stagione + ' ' + //stagione
           ')';
           //  console.log(queryText);
-          inserts.push(db.none(queryText));
 
         }
+
+        inserts.push(db.none(queryText));
 
       }       
       return t.batch(inserts);

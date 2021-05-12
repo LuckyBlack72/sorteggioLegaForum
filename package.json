@@ -18,7 +18,7 @@
     "helmet": "^3.13.0",
     "jade": "~1.11.0",
     "morgan": "~1.8.1",
-    "nodemailer": "^4.6.8",
+    "nodemailer": "^6.4.16",
     "pg-promise": "^8.4.6",
     "promise-mysql": "^3.3.1"
   },

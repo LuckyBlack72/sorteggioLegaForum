@@ -454,7 +454,7 @@ router.post('/checkSorteggio', function(req, res, next) {
     }  
   })
   .catch(error => { //gestione errore
-    console.log('err 500');
+    console.log(error);
     res.status(500).json(false);
   });  
   

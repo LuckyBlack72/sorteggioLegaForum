@@ -438,6 +438,8 @@ router.post('/checkSorteggio', function(req, res, next) {
   var queryText = 'select count(*) from legaforum.sorteggio where stagione = ' + req.body.stagione + ' ' +
                   'and girone is not null';
 
+  console.log(queryText);
+
   db.one(queryText).then(function (data) {
     
     if(parseInt(data.count) < 96){

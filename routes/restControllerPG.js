@@ -11,6 +11,7 @@ var Excel = require('exceljs'); // LF 16/07/2018 per creare export Excel
 
 //se è definita POSTGRESQL_URI la usa altrimenti usa LocalHost
 // postgresql://postgres:root@localhost:5432/postgres
+//Aggiunta la variabile PGSSLMODE valore require alle config vars del contenitore Heroku 06-2021
 var connectionData = process.env.DATABASE_URL || // URI 'postgres://postgres:root@localhost:5432/postgres';
                     {
                       host : 'localhost',
@@ -435,18 +436,11 @@ router.post('/sendMail', function(req, res, next) {
 /* POST checkSorteggio */
 router.post('/checkSorteggio', function(req, res, next) {
 
-
-  console.log(connectionData);
-
   var queryText = 'select count(*) from legaforum.sorteggio where stagione = ' + req.body.stagione + ' ' +
                   'and girone is not null';
 
-  console.log(queryText);
-
   db.one(queryText).then(function (data) {
     
-    console.log('count : ' + data.count);
-
     if(parseInt(data.count) < 96){
       res.status(200).json(true);
     }else{
@@ -454,7 +448,6 @@ router.post('/checkSorteggio', function(req, res, next) {
     }  
   })
   .catch(error => { //gestione errore
-    console.log(error);
     res.status(500).json(false);
   });  
   

@@ -435,8 +435,11 @@ router.post('/sendMail', function(req, res, next) {
 /* POST checkSorteggio */
 router.post('/checkSorteggio', function(req, res, next) {
 
-  var queryText = 'select count(*) from legaforum.sorteggio where stagione = ' + req.body.stagione + ' ' +
-                  'and girone is not null';
+  //var queryText = 'select count(*) from legaforum.sorteggio where stagione = ' + req.body.stagione + ' ' +
+  //                'and girone is not null';
+
+  var queryText = 'select count(*) from legaforum.sorteggio where stagione = ' + '2020' + ' ' +
+  'and girone is not null';                  
 
   console.log(queryText);
 

@@ -442,6 +442,8 @@ router.post('/checkSorteggio', function(req, res, next) {
 
   db.one(queryText).then(function (data) {
     
+    console.log('count : ' + data.count);
+
     if(parseInt(data.count) < 96){
       res.status(200).json(true);
     }else{
@@ -449,6 +451,7 @@ router.post('/checkSorteggio', function(req, res, next) {
     }  
   })
   .catch(error => { //gestione errore
+    console.log('err 500');
     res.status(500).json(false);
   });  
   

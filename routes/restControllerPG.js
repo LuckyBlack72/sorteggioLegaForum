@@ -136,6 +136,21 @@ router.post('/getSquadre', function(req, res, next) {
   
 });
 
+/* POST getAllenatori */
+router.post('/getAllenatori', function(req, res, next) {
+  
+  db.any('select distinct(allenatore) from legaforum.sorteggio order by allenatore').then(function (listaAllenatori) {
+
+    //torno un'oggetto json
+    res.status(200).json(listaAllenatori);
+    
+  })
+  .catch(error => { //gestione errore
+    res.status(200).json(listaAllenatori);
+  });    
+  
+});
+
 /* POST getSorteggioStagione */ /* Fatto */
 router.post('/getSorteggioStagione', function(req, res, next) {
 
@@ -216,7 +231,23 @@ router.post('/getSorteggioSquadra', function(req, res, next) {
 
 });
 
+/* POST getSorteggioAllenatore */
+router.post('/getSorteggioAllenatore', function(req, res, next) {
 
+  var queryText = 'select id,squadra,allenatore,stagione,serie,fascia,ranking,girone,ods ' + 
+  'from legaforum.sorteggio where allenatore = ' + '\'' + req.body.allenatore + '\'' + ' order by stagione asc ';
+  
+  db.any(queryText).then(function (sorteggiSquadra) {
+    
+    //torno un'oggetto json
+    res.status(200).json(sorteggiSquadra);
+
+  })
+  .catch(error => { //gestione errore
+    res.status(200).json(sorteggiSquadra);
+  });  
+
+});
 
 /* POST checkPassword */
 router.post('/checkPassword', function(req, res, next) {
